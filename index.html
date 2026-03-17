@@ -71,7 +71,7 @@
       white-space: nowrap;
     }
     .summary {
-      display: grid;
+      display: none;
       grid-template-columns: repeat(3, 1fr);
       gap: 10px;
       margin-bottom: 16px;
@@ -117,28 +117,30 @@
       line-height: 1.7;
       padding: 8px 2px;
     }
-    .player {
+    .role-box {
       border: 1px solid #e5e7eb;
       border-radius: 12px;
       padding: 12px;
       margin-bottom: 10px;
+      background: #ffffff;
     }
-    .player .name {
+    .role-title {
       font-size: 18px;
       font-weight: 700;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
     }
-    .meta {
+    .role-items {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      color: #4b5563;
-      font-size: 13px;
     }
-    .tag {
+    .role-item {
       background: #f3f4f6;
       border-radius: 999px;
-      padding: 4px 8px;
+      padding: 4px 10px;
+      color: #374151;
+      font-size: 13px;
+      line-height: 1.5;
     }
     @media (max-width: 900px) {
       .layout { grid-template-columns: 1fr; }
@@ -156,7 +158,7 @@
 <body>
   <div class="wrap">
     <h1 class="title">KPL 籍贯中国分布地图</h1>
-    <p class="desc">点击任意省份，右侧会显示该省选手列表。下面这份数据只是演示样例，你后面把 <code>players</code> 数组替换成自己的真实名单就行。</p>
+    <p class="desc">点击任意省份，右侧（电脑网页）/下方（手机网页）会显示该省选手列表。双指可缩放地图。</p>
 
     <div class="layout">
       <div class="card">
@@ -204,6 +206,7 @@
       { name: '轩染', team: '成都AG超玩会', role: '对抗路', province: '河南' },
       { name: '钟意', team: '成都AG超玩会', role: '打野', province: '广东' },
       { name: '大帅', team: '成都AG超玩会', role: '游走', province: '山东' },
+	  { name: 'bao', team: '成都AG超玩会', role: '教练', province: '山东' },
 
       { name: '花海', team: '武汉eStarPro', role: '打野', province: '广东' },
       { name: '清融', team: '武汉eStarPro', role: '中路', province: '福建' },
@@ -289,10 +292,25 @@
         label: {
           show: true,
           fontSize: 10,
-          color: '#334155'
+          color: '#334155',
+          lineHeight: 13,
+          formatter: (params) => {
+            const province = normalizeProvince(params.name || '');
+            const count = grouped[province]?.length || 0;
+            return `${province}
+${count}`;
+          }
         },
         emphasis: {
-          label: { color: '#111827' },
+          label: {
+            color: '#111827',
+            formatter: (params) => {
+              const province = normalizeProvince(params.name || '');
+              const count = grouped[province]?.length || 0;
+              return `${province}
+${count}`;
+            }
+          },
           itemStyle: { areaColor: '#ffd166' }
         },
         itemStyle: {
@@ -319,6 +337,8 @@
 
     let currentProvince = null;
 
+    const roleOrder = ['对抗路', '打野', '中路', '发育路', '游走', '教练'];
+
     function renderPlayers(province, keyword = '') {
       const all = grouped[province] || [];
       const key = keyword.trim().toLowerCase();
@@ -340,13 +360,16 @@
         return;
       }
 
-      playerList.innerHTML = filtered.map(player => `
-        <div class="player">
-          <div class="name">${player.name}</div>
-          <div class="meta">
-            <span class="tag">${player.team}</span>
-            <span class="tag">${player.role}</span>
-            <span class="tag">${player.province}</span>
+      const roleGroups = roleOrder.map(role => ({
+        role,
+        players: filtered.filter(player => player.role === role)
+      })).filter(group => group.players.length > 0);
+
+      playerList.innerHTML = roleGroups.map(group => `
+        <div class="role-box">
+          <div class="role-title">${group.role}</div>
+          <div class="role-items">
+            ${group.players.map(player => `<span class="role-item">${player.team}-${player.name}</span>`).join('')}
           </div>
         </div>
       `).join('');
