@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KPL籍贯分布地图</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: #f5f7fb;
+      color: #1f2937;
+    }
+    .wrap {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .title {
+      margin: 0 0 8px;
+      font-size: 28px;
+      font-weight: 700;
+    }
+    .desc {
+      margin: 0 0 18px;
+      color: #6b7280;
+      line-height: 1.6;
+      font-size: 14px;
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: 1.55fr 0.95fr;
+      gap: 16px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(31, 41, 55, 0.08);
+      overflow: hidden;
+    }
+    #map {
+      width: 100%;
+      height: 76vh;
+      min-height: 580px;
+    }
+    .panel {
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      height: 76vh;
+      min-height: 580px;
+    }
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .panel-title {
+      font-size: 22px;
+      margin: 0;
+    }
+    .pill {
+      background: #eef2ff;
+      color: #4338ca;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .stat {
+      background: #f8fafc;
+      border-radius: 12px;
+      padding: 12px;
+    }
+    .stat .label {
+      color: #6b7280;
+      font-size: 12px;
+      margin-bottom: 6px;
+    }
+    .stat .value {
+      font-size: 22px;
+      font-weight: 700;
+    }
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .toolbar input {
+      width: 100%;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 14px;
+      outline: none;
+    }
+    .toolbar input:focus {
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99,102,241,.12);
+    }
+    .list {
+      overflow: auto;
+      padding-right: 4px;
+      flex: 1;
+    }
+    .empty {
+      color: #6b7280;
+      line-height: 1.7;
+      padding: 8px 2px;
+    }
+    .player {
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+    .player .name {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      color: #4b5563;
+      font-size: 13px;
+    }
+    .tag {
+      background: #f3f4f6;
+      border-radius: 999px;
+      padding: 4px 8px;
+    }
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; }
+      #map, .panel { height: auto; min-height: 420px; }
+      .summary { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 640px) {
+      .wrap { padding: 12px; }
+      .title { font-size: 22px; }
+      .summary { grid-template-columns: 1fr; }
+      .panel-title { font-size: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1 class="title">KPL 籍贯中国分布地图</h1>
+    <p class="desc">点击任意省份，右侧会显示该省选手列表。下面这份数据只是演示样例，你后面把 <code>players</code> 数组替换成自己的真实名单就行。</p>
+
+    <div class="layout">
+      <div class="card">
+        <div id="map"></div>
+      </div>
+
+      <div class="card panel">
+        <div class="panel-head">
+          <h2 id="provinceTitle" class="panel-title">未选择省份</h2>
+          <div id="provinceCount" class="pill">0 人</div>
+        </div>
+
+        <div class="summary">
+          <div class="stat">
+            <div class="label">样例总人数</div>
+            <div id="totalPlayers" class="value">0</div>
+          </div>
+          <div class="stat">
+            <div class="label">覆盖省份数</div>
+            <div id="coveredProvinces" class="value">0</div>
+          </div>
+          <div class="stat">
+            <div class="label">当前省份人数</div>
+            <div id="currentPlayers" class="value">0</div>
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <input id="keywordInput" type="text" placeholder="搜索当前省份里的选手、战队或位置" />
+        </div>
+
+        <div id="playerList" class="list">
+          <div class="empty">先点地图中的一个省份。<br />电脑端可以鼠标点击，手机端可以直接点按。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/echarts@6/dist/echarts.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/echarts-map@3.0.1/js/china.js"></script>
+  <script>
+    const players = [
+      { name: '一诺', team: '成都AG超玩会', role: '发育路', province: '重庆' },
+      { name: '长生', team: '成都AG超玩会', role: '中路', province: '江苏' },
+      { name: '轩染', team: '成都AG超玩会', role: '对抗路', province: '河南' },
+      { name: '钟意', team: '成都AG超玩会', role: '打野', province: '广东' },
+      { name: '大帅', team: '成都AG超玩会', role: '游走', province: '山东' },
+
+      { name: '花海', team: '武汉eStarPro', role: '打野', province: '广东' },
+      { name: '清融', team: '武汉eStarPro', role: '中路', province: '福建' },
+      { name: '子阳', team: '武汉eStarPro', role: '游走', province: '江苏' },
+      { name: '坦然', team: '武汉eStarPro', role: '对抗路', province: '湖南' },
+
+      { name: '小胖', team: '重庆狼队', role: '打野', province: '四川' },
+      { name: 'Fly', team: '重庆狼队', role: '对抗路', province: '重庆' },
+      { name: '向鱼', team: '重庆狼队', role: '中路', province: '贵州' },
+      { name: '妖刀', team: '重庆狼队', role: '发育路', province: '云南' },
+      { name: '帆帆', team: '重庆狼队', role: '游走', province: '广东' },
+
+      { name: '暖阳', team: '北京WB', role: '打野', province: '浙江' },
+      { name: '花卷', team: '北京WB', role: '中路', province: '福建' },
+      { name: '梓墨', team: '北京WB', role: '对抗路', province: '河南' },
+      { name: '乔兮', team: '北京WB', role: '发育路', province: '河北' },
+      { name: '星宇', team: '北京WB', role: '游走', province: '山东' },
+
+      { name: '久酷', team: '南京Hero久竞', role: '发育路', province: '安徽' },
+      { name: '无畏', team: '南京Hero久竞', role: '打野', province: '福建' },
+      { name: '星痕', team: '南京Hero久竞', role: '对抗路', province: '山西' },
+      { name: '清一色', team: '南京Hero久竞', role: '中路', province: '湖北' }
+    ];
+
+    const provinceAlias = {
+      '北京市': '北京',
+      '天津市': '天津',
+      '上海市': '上海',
+      '重庆市': '重庆',
+      '内蒙古自治区': '内蒙古',
+      '广西壮族自治区': '广西',
+      '西藏自治区': '西藏',
+      '宁夏回族自治区': '宁夏',
+      '新疆维吾尔自治区': '新疆',
+      '香港特别行政区': '香港',
+      '澳门特别行政区': '澳门',
+      '台湾省': '台湾'
+    };
+
+    const normalizeProvince = (name) => provinceAlias[name] || name.replace(/省$/,'').replace(/市$/,'');
+
+    const grouped = players.reduce((acc, player) => {
+      const province = normalizeProvince(player.province);
+      if (!acc[province]) acc[province] = [];
+      acc[province].push({ ...player, province });
+      return acc;
+    }, {});
+
+    const mapData = Object.entries(grouped).map(([name, list]) => ({
+      name,
+      value: list.length
+    }));
+
+    const maxValue = Math.max(...mapData.map(item => item.value), 1);
+    const chart = echarts.init(document.getElementById('map'), null, { renderer: 'canvas' });
+
+    const option = {
+      tooltip: {
+        trigger: 'item',
+        formatter: (params) => {
+          const province = normalizeProvince(params.name || '');
+          const count = grouped[province]?.length || 0;
+          return `${province}<br/>选手人数：${count}`;
+        }
+      },
+      visualMap: {
+        min: 0,
+        max: maxValue,
+        left: 20,
+        bottom: 20,
+        text: ['人数多', '人数少'],
+        calculable: true,
+        inRange: {
+          color: ['#e0ecff', '#a9c6ff', '#6f99ff', '#3d65e0']
+        }
+      },
+      series: [{
+        type: 'map',
+        map: 'china',
+        roam: true,
+        zoom: 1.1,
+        selectedMode: 'single',
+        label: {
+          show: true,
+          fontSize: 10,
+          color: '#334155'
+        },
+        emphasis: {
+          label: { color: '#111827' },
+          itemStyle: { areaColor: '#ffd166' }
+        },
+        itemStyle: {
+          borderColor: '#ffffff',
+          borderWidth: 1,
+          areaColor: '#f3f4f6'
+        },
+        data: mapData
+      }]
+    };
+
+    chart.setOption(option);
+
+    const provinceTitle = document.getElementById('provinceTitle');
+    const provinceCount = document.getElementById('provinceCount');
+    const currentPlayers = document.getElementById('currentPlayers');
+    const totalPlayers = document.getElementById('totalPlayers');
+    const coveredProvinces = document.getElementById('coveredProvinces');
+    const playerList = document.getElementById('playerList');
+    const keywordInput = document.getElementById('keywordInput');
+
+    totalPlayers.textContent = players.length;
+    coveredProvinces.textContent = Object.keys(grouped).length;
+
+    let currentProvince = null;
+
+    function renderPlayers(province, keyword = '') {
+      const all = grouped[province] || [];
+      const key = keyword.trim().toLowerCase();
+      const filtered = !key ? all : all.filter(p =>
+        [p.name, p.team, p.role].some(v => String(v).toLowerCase().includes(key))
+      );
+
+      provinceTitle.textContent = province || '未选择省份';
+      provinceCount.textContent = `${all.length} 人`;
+      currentPlayers.textContent = all.length;
+
+      if (!province) {
+        playerList.innerHTML = '<div class="empty">先点地图中的一个省份。<br />电脑端可以鼠标点击，手机端可以直接点按。</div>';
+        return;
+      }
+
+      if (!filtered.length) {
+        playerList.innerHTML = '<div class="empty">这个省份有选手，但当前搜索词没有匹配结果。</div>';
+        return;
+      }
+
+      playerList.innerHTML = filtered.map(player => `
+        <div class="player">
+          <div class="name">${player.name}</div>
+          <div class="meta">
+            <span class="tag">${player.team}</span>
+            <span class="tag">${player.role}</span>
+            <span class="tag">${player.province}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    chart.on('click', function (params) {
+      currentProvince = normalizeProvince(params.name || '');
+      renderPlayers(currentProvince, keywordInput.value);
+    });
+
+    keywordInput.addEventListener('input', () => {
+      renderPlayers(currentProvince, keywordInput.value);
+    });
+
+    window.addEventListener('resize', () => chart.resize());
+  </script>
+</body>
+</html>
