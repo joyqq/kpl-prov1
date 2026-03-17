@@ -33,6 +33,20 @@
       grid-template-columns: 1.55fr 0.95fr;
       gap: 16px;
     }
+	.role-empty {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: #EF5350;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+}
     .card {
       background: #fff;
       border-radius: 16px;
@@ -157,8 +171,8 @@
 </head>
 <body>
   <div class="wrap">
-    <h1 class="title">KPL 籍贯中国分布地图</h1>
-    <p class="desc">点击任意省份，右侧（电脑网页）/下方（手机网页）会显示该省选手列表。双指可缩放地图。</p>
+    <h1 class="title">KPL 籍贯分布地图（26春季赛大名单）</h1>
+    <p class="desc">点击任意省份，右侧（电脑网页）/下方（手机网页）会显示该省选手列表。手机上双指可缩放地图。</p>
 
     <div class="layout">
       <div class="card">
@@ -201,35 +215,166 @@
   <script src="https://cdn.jsdelivr.net/npm/echarts-map@3.0.1/js/china.js"></script>
   <script>
     const players = [
-      { name: '一诺', team: '成都AG超玩会', role: '发育路', province: '重庆' },
-      { name: '长生', team: '成都AG超玩会', role: '中路', province: '江苏' },
-      { name: '轩染', team: '成都AG超玩会', role: '对抗路', province: '河南' },
-      { name: '钟意', team: '成都AG超玩会', role: '打野', province: '广东' },
-      { name: '大帅', team: '成都AG超玩会', role: '游走', province: '山东' },
-	  { name: 'bao', team: '成都AG超玩会', role: '教练', province: '山东' },
+  { name: 'Fly', team: 'eStarPro', role: '对抗路', province: '重庆' },
+  { name: '初晨', team: 'RW', role: '打野', province: '安徽' },
+  { name: '一诺', team: 'AG', role: '发育路', province: '江西' },
+  { name: '暖阳', team: 'WB', role: '打野', province: '浙江' },
+  { name: '阿豆', team: 'TTG', role: '游走', province: '安徽' },
+  { name: '九尾', team: 'LGD', role: '中路', province: '福建' },
+  { name: '轩染', team: 'DYG', role: '发育路', province: '福建' },
+  { name: '北诗', team: 'AG', role: '对抗路', province: '浙江' },
+  { name: '清清', team: '狼队', role: '对抗路', province: '浙江' },
+  { name: '冰尘', team: 'LGD', role: '游走', province: '山东' },
+  { name: '久酷', team: 'RNG.M', role: '游走', province: '湖南' },
+  { name: '妖刀', team: 'Hero', role: '发育路', province: '四川' },
+  { name: '小A', team: 'JDG', role: '游走', province: '福建' },
+  { name: '花卷', team: 'EDG.M', role: '中路', province: '广东' },
+  { name: '清融', team: 'JDG', role: '中路', province: '江西' },
+  { name: '向鱼', team: 'DYG', role: '中路', province: '重庆' },
+  { name: '无畏', team: 'JDG', role: '游走', province: '福建' },
+  { name: '梓墨', team: 'WB', role: '对抗路', province: '江西' },
+  { name: '梦岚', team: 'DRG', role: '发育路', province: '湖南' },
+  { name: '小胖', team: '狼队', role: '打野', province: '贵州' },
+  { name: '帆帆', team: 'TES.A', role: '游走', province: '江西' },
+  { name: '今屿', team: 'RW', role: '打野', province: '湖南' },
+  { name: '子阳', team: 'KSG', role: '游走', province: '湖南' },
+  { name: '小玖', team: 'JDG', role: '发育路', province: '重庆' },
+  { name: '救赎', team: 'AG', role: '游走', province: '山东' },
 
-      { name: '花海', team: '武汉eStarPro', role: '打野', province: '广东' },
-      { name: '清融', team: '武汉eStarPro', role: '中路', province: '福建' },
-      { name: '子阳', team: '武汉eStarPro', role: '游走', province: '江苏' },
-      { name: '坦然', team: '武汉eStarPro', role: '对抗路', province: '湖南' },
+  { name: '晚星', team: '狼队', role: '游走', province: '湖南' },
+  { name: '坦然', team: 'Hero', role: '对抗路', province: '福建' },
+  { name: '乔兮', team: 'WB', role: '发育路', province: '江西' },
+  { name: 'Ming', team: 'eStarPro', role: '中路', province: '广东' },
+  { name: '佩恩', team: 'RW', role: '发育路', province: '湖南' },
+  { name: '小崽', team: 'LGD', role: '游走', province: '浙江' },
+  { name: '紫幻', team: '狼队', role: '中路', province: '四川' },
+  { name: '一笙', team: 'KSG', role: '游走', province: '云南' },
+  { name: '忆安', team: 'WE', role: '游走', province: '安徽' },
+  { name: 'Silver', team: 'Hero', role: '发育路', province: '河南' },
+  { name: '赤辰', team: 'RNG.M', role: '打野', province: '辽宁' },
+  { name: '风箫', team: 'KSG', role: '发育路', province: '山东' },
+  { name: '蓝桉', team: 'TES.A', role: '发育路', province: '河北' },
+  { name: '长生', team: 'AG', role: '中路', province: '浙江' },
+  { name: '小久', team: 'LGD', role: '发育路', province: '湖南' },
+  { name: '小落', team: 'LGD', role: '对抗路', province: '重庆' },
+  { name: '绝意', team: 'JDG', role: '发育路', province: '湖南' },
+  { name: '钟意', team: 'AG', role: '打野', province: '四川' },
+  { name: '归期', team: '狼队', role: '对抗路', province: '上海' },
+  { name: '誓约', team: 'eStarPro', role: '对抗路', province: '广东' },
+  { name: '零枫', team: 'JDG', role: '对抗路', province: '湖南' },
+  { name: '轻语', team: 'JDG', role: '对抗路', province: '湖南' },
+  { name: '小乐', team: 'DYG', role: '对抗路', province: '广西' },
+  { name: '极光', team: 'RNG.M', role: '发育路', province: '安徽' },
+  { name: '夏凌', team: 'EDG.M', role: '打野', province: '四川' },
+  { name: '流浪', team: 'KSG', role: '中路', province: '重庆' },
 
-      { name: '小胖', team: '重庆狼队', role: '打野', province: '四川' },
-      { name: 'Fly', team: '重庆狼队', role: '对抗路', province: '重庆' },
-      { name: '向鱼', team: '重庆狼队', role: '中路', province: '贵州' },
-      { name: '妖刀', team: '重庆狼队', role: '发育路', province: '云南' },
-      { name: '帆帆', team: '重庆狼队', role: '游走', province: '广东' },
+  { name: '景诗', team: 'TES.A', role: '中路', province: '重庆' },
+  { name: '道崽', team: '狼队', role: '发育路', province: '浙江' },
+  { name: '无双', team: 'JDG', role: '打野', province: '湖北' },
+  { name: '小度', team: 'RW', role: '对抗路', province: '广东' },
+  { name: '轩染', team: 'AG', role: '对抗路', province: '湖南' },
+  { name: '大师', team: 'AG', role: '游走', province: '湖北' },
+  { name: '流星', team: 'KSG', role: '对抗路', province: '江苏' },
+  { name: '梦溪', team: 'RW', role: '游走', province: '安徽' },
+  { name: '落尘', team: 'Hero', role: '打野', province: '湖南' },
+  { name: '无幻', team: 'TES.A', role: '对抗路', province: '浙江' },
+  { name: '小麦', team: 'WB', role: '发育路', province: '湖南' },
+  { name: '小楼', team: 'eStarPro', role: '打野', province: '浙江' },
+  { name: '皖皖', team: '狼队', role: '打野', province: '山东' },
+  { name: '萝卜', team: 'TTG', role: '对抗路', province: '广东' },
+  { name: '明崽', team: 'WE', role: '中路', province: '江苏' },
+  { name: '小泽', team: 'EDG.M', role: '对抗路', province: '上海' },
+  { name: '挽墨', team: 'RW', role: '中路', province: '湖北' },
+  { name: '雨空', team: 'RNG.M', role: '中路', province: '广东' },
+  { name: '鹤辞', team: 'TTG', role: '中路', province: '河北' },
+  { name: '青槐', team: 'TCG', role: '对抗路', province: '安徽' },
+  { name: '小轩', team: 'DYG', role: '打野', province: '江西' },
+  { name: '墨衍', team: 'WE', role: '发育路', province: '山东' },
+  { name: '小俞', team: 'AG', role: '发育路', province: '江西' },
+  { name: '听悦', team: 'WB', role: '中路', province: '湖南' },
+  { name: '旬号', team: 'KSG', role: '打野', province: '江苏' },
+  { name: '佳心', team: 'TTG', role: '打野', province: '辽宁' },
 
-      { name: '暖阳', team: '北京WB', role: '打野', province: '浙江' },
-      { name: '花卷', team: '北京WB', role: '中路', province: '福建' },
-      { name: '梓墨', team: '北京WB', role: '对抗路', province: '河南' },
-      { name: '乔兮', team: '北京WB', role: '发育路', province: '河北' },
-      { name: '星宇', team: '北京WB', role: '游走', province: '山东' },
+  { name: '涛', team: 'EDG.M', role: '游走', province: '浙江' },
+  { name: '花缘', team: 'DRG', role: '对抗路', province: '广东' },
+  { name: '樱花', team: 'RNG.M', role: '发育路', province: '福建' },
+  { name: '亮宇', team: 'eStarPro', role: '发育路', province: '浙江' },
+  { name: '陌冷', team: '情久', role: '发育路', province: '江苏' },
+  { name: '久寒', team: '情久', role: '中路', province: '广东' },
+  { name: '安七', team: 'TES.A', role: '打野', province: '江西' },
+  { name: '小名', team: 'LGD', role: '中路', province: '浙江' },
+  { name: '凌云', team: 'EDG.M', role: '发育路', province: '浙江' },
+  { name: '深巍', team: '情久', role: '打野', province: '江苏' },
+  { name: '小优', team: 'RNG.M', role: '中路', province: '河北' },
+  { name: '栋栋', team: 'DYG', role: '对抗路', province: '河南' },
+  { name: '白衣', team: '情久', role: '游走', province: '辽宁' },
+  { name: '小雪', team: 'TTG', role: '发育路', province: '山东' },
+  { name: '紫渊', team: 'eStarPro', role: '游走', province: '内蒙古' },
+  { name: '花花', team: 'LGD', role: '对抗路', province: '浙江' },
+  { name: '信', team: '狼队', role: '游走', province: '四川' },
+  { name: '小涵', team: 'LGD', role: '发育路', province: '江西' },
+  { name: '秋源', team: 'DYG', role: '发育路', province: '安徽' },
+  { name: '玖欣', team: 'WB', role: '游走', province: '湖北' },
+  { name: '润润', team: 'RNG.M', role: '发育路', province: '重庆' },
+  { name: '子意', team: 'WE', role: '打野', province: '江苏' },
+  { name: '玖熙', team: 'Hero', role: '中路', province: '辽宁' },
+  { name: '嘉宝', team: 'TTG', role: '打野', province: '江西' },
+  { name: '鸣鸣', team: 'EDG.M', role: '发育路', province: '河南' },
+  { name: '旭旭', team: 'DRG', role: '中路', province: '安徽' },
 
-      { name: '久酷', team: '南京Hero久竞', role: '发育路', province: '安徽' },
-      { name: '无畏', team: '南京Hero久竞', role: '打野', province: '福建' },
-      { name: '星痕', team: '南京Hero久竞', role: '对抗路', province: '山西' },
-      { name: '清一色', team: '南京Hero久竞', role: '中路', province: '湖北' }
-    ];
+  { name: '小团', team: 'RNG.M', role: '对抗路', province: '四川' },
+  { name: '落空', team: 'DYG', role: '游走', province: '四川' },
+  { name: '无玄', team: '情久', role: '对抗路', province: '福建' },
+  { name: '白清', team: 'Hero', role: '游走', province: '浙江' },
+  { name: '染洋', team: 'AG', role: '打野', province: '重庆' },
+  { name: '小凡', team: 'AG', role: '中路', province: '山东' },
+  { name: '小屿', team: 'KSG', role: '发育路', province: '山东' },
+  { name: '涵', team: 'TTG', role: '游走', province: '' },
+  { name: '小小阳', team: 'DRG', role: '打野', province: '浙江' },
+  { name: '无言', team: 'KSG', role: '对抗路', province: '湖南' },
+  { name: '柚子', team: 'DRG', role: '中路', province: '山东' },
+  { name: '呆呆', team: 'DRG', role: '游走', province: '福建' },
+  { name: '楠枫', team: '情久', role: '游走', province: '湖南' },
+  { name: '昭珏', team: 'WE', role: '发育路', province: '河南' },
+  { name: '米苏', team: 'LGD', role: '打野', province: '山东' },
+  { name: '文涛', team: 'WE', role: '对抗路', province: '湖南' },
+  { name: '光明', team: 'TCG', role: '对抗路', province: '' },
+  { name: '清弦', team: 'TCG', role: '中路', province: '重庆' },
+  { name: '北觅', team: 'TCG', role: '发育路', province: '河南' },
+  { name: '数字', team: 'TCG', role: '游走', province: '重庆' },
+  { name: '安凉', team: 'TCG', role: '打野', province: '安徽' },
+  { name: '小碎', team: 'EDG.M', role: '游走', province: '' },
+  { name: '书源', team: 'TES.A', role: '打野', province: '吉林' },
+  { name: '昊昊', team: 'eStarPro', role: '中路', province: '' },
+  { name: '小寒', team: 'JDG', role: '发育路', province: '' },
+  { name: '余忆', team: 'eStarPro', role: '打野', province: '广东' },
+
+  { name: '航航', team: 'RNG.M', role: '打野', province: '' },
+  { name: '星河', team: 'TES.A', role: '游走', province: '' },
+  { name: '大海', team: 'TCG', role: '对抗路', province: '福建' },
+  { name: '果冻', team: 'WB', role: '中路', province: '福建' },
+  { name: '源', team: 'DRG', role: '游走', province: '' },
+  { name: '恒心', team: '情久', role: '对抗路', province: '湖南' },
+  { name: '多多', team: 'Hero', role: '中路', province: '江西' },
+  { name: '九幽', team: 'WE', role: '游走', province: '重庆' },
+  { name: '江雾', team: 'TCG', role: '中路', province: '河南' },
+  { name: '星童', team: 'DYG', role: '中路', province: '江西' },
+  { name: '奶龙', team: 'JDG', role: '对抗路', province: '' },
+  { name: '绝心', team: 'Hero', role: '游走', province: '湖南' },
+  { name: '奕雨', team: 'RNG.M', role: '发育路', province: '' },
+  { name: '烈峰峥', team: 'AG', role: '游走', province: '' },
+  { name: '雨寂', team: 'WB', role: '对抗路', province: '河南' },
+  { name: '熙河', team: 'TCG', role: '对抗路', province: '河南' },
+  { name: '丞丞', team: 'WB', role: '打野', province: '江苏' },
+  { name: '小小飞', team: 'TES.A', role: '发育路', province: '湖北' },
+  { name: '叶凡', team: 'DYG', role: '游走', province: '辽宁' },
+  { name: '百炼', team: 'EDG.M', role: '打野', province: '' },
+  { name: '小团', team: 'RW', role: '打野', province: '' },
+  { name: '浅风', team: 'eStarPro', role: '对抗路', province: '' },
+  { name: '苏瞳', team: 'RW', role: '对抗路', province: '' },
+  { name: '凌瑞', team: 'DYG', role: '打野', province: '' },
+  { name: '月秋', team: 'EDG.M', role: '中路', province: '' }
+];
 
     const provinceAlias = {
       '北京市': '北京',
@@ -337,7 +482,7 @@ ${count}`;
 
     let currentProvince = null;
 
-    const roleOrder = ['对抗路', '打野', '中路', '发育路', '游走', '教练'];
+    const roleOrder = ['对抗路', '打野', '中路', '发育路', '游走'];
 
     function renderPlayers(province, keyword = '') {
       const all = grouped[province] || [];
@@ -354,6 +499,12 @@ ${count}`;
         playerList.innerHTML = '<div class="empty">先点地图中的一个省份。<br />电脑端可以鼠标点击，手机端可以直接点按。</div>';
         return;
       }
+	  
+	  // 新增：该省本来就没有选手
+      if (!all.length) {
+        playerList.innerHTML = '<div class="empty">暂无该籍贯选手。</div>';
+        return;
+      }
 
       if (!filtered.length) {
         playerList.innerHTML = '<div class="empty">这个省份有选手，但当前搜索词没有匹配结果。</div>';
@@ -361,18 +512,22 @@ ${count}`;
       }
 
       const roleGroups = roleOrder.map(role => ({
-        role,
-        players: filtered.filter(player => player.role === role)
-      })).filter(group => group.players.length > 0);
+  role,
+  players: filtered.filter(player => player.role === role)
+}));
 
-      playerList.innerHTML = roleGroups.map(group => `
-        <div class="role-box">
-          <div class="role-title">${group.role}</div>
-          <div class="role-items">
-            ${group.players.map(player => `<span class="role-item">${player.team}-${player.name}</span>`).join('')}
-          </div>
-        </div>
-      `).join('');
+playerList.innerHTML = roleGroups.map(group => `
+  <div class="role-box">
+    <div class="role-title">${group.role}</div>
+    <div class="role-items">
+      ${
+        group.players.length
+          ? group.players.map(player => `<span class="role-item">${player.team}-${player.name}</span>`).join('')
+          : `<span class="role-empty">0</span>`
+      }
+    </div>
+  </div>
+`).join('');
     }
 
     chart.on('click', function (params) {
